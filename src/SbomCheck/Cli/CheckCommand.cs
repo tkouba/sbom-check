@@ -24,6 +24,7 @@ class CheckCommand : Command<CheckCommandSettings>
 
         var result = new LicensesResult
         {
+            Status = LicenseStatus.None, // Placeholder, real status calculation would go here
             TotalComponents = bom.Components.Count,
             LicenseDetails = licenseCounts.ToList()
         };

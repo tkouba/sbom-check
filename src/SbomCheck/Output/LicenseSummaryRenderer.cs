@@ -10,9 +10,9 @@ static class LicenseSummaryRenderer
         // Characters like ✔ and ✖ can cause issues in some terminals, so using text instead.
         String statusText = result.Status switch
         {
-            LicensesStatus.Valid => "[green]Valid[/]: ",
-            LicensesStatus.Invalid => "[red]Invalid[/]: ",
-            LicensesStatus.Unknown => "[red]Invalid[/]: ", //"[dim]Unknown[/]: "
+            LicenseStatus.Valid => "[green]Valid[/]: ",
+            LicenseStatus.Invalid => "[red]Invalid[/]: ",
+            LicenseStatus.Unknown => "[red]Invalid[/]: ", //"[dim]Unknown[/]: "
             _ => ""
         };
         AnsiConsole.MarkupLine($"{statusText}License summary");

@@ -1,6 +1,6 @@
 ﻿namespace SbomCheck.Models
 {
-    public enum LicensesStatus
+    public enum LicenseStatus
     {
         /// <summary>
         /// Default value, licenses status not resolved

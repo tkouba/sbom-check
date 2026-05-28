@@ -32,11 +32,15 @@ sbom-check bom.json
 Output:
 
 ```
-Licenses used:
-- MIT (12)
-- Apache-2.0 (8)
-- Microsoft (5)
-- UNKNOWN (2)
+License summary
+
+  MIT                  5
+  Apache-2.0           2
+  GPL                  1
+  Proprietary License  1
+  UNKNOWN              1
+
+Total components found: 9
 ```
 
 ---
