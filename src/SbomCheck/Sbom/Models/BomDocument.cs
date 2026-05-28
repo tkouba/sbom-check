@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace SbomCheck.Sbom.Models;
 
-record BomDocument(
-    [property: JsonPropertyName("components")] List<Component> Components
-);
+record BomDocument
+{
+    [JsonPropertyName("components")]
+    public List<Component> Components { get; init; } = [];
+}

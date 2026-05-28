@@ -9,12 +9,19 @@
     <ToolCommandName>sbom-check</ToolCommandName>
     <PackageId>sbom-check</PackageId>
     <Version>0.1.0</Version>
+	<Authors>Tomas Kouba</Authors>
     <Description>Lightweight CLI tool to analyze and enforce policies on CycloneDX SBOMs.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NuGet.Versioning" Version="7.6.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.55.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SbomCheck.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/SbomCheck/SbomCheck.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SbomCheck.Tests/SbomCheck.Tests.csproj" />
+  </Folder>
 </Solution>
