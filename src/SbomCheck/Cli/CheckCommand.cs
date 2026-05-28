@@ -18,6 +18,15 @@ class CheckCommand : Command<CheckCommandSettings>
             return 1;
         }
 
+        // Deduplicate: same name+version (case-insensitive) → keep first occurrence
+        bom = bom with
+        {
+            Components = bom.Components
+                .GroupBy(c => (c.Name.ToLowerInvariant(), (c.Version ?? "").ToLowerInvariant()))
+                .Select(g => g.First())
+                .ToList()
+        };
+
         var forbiddenLicenses   = FlattenSimple(settings.ForbiddenLicenses);
         var allowedLicenses     = FlattenSimple(settings.AllowedLicenses);
         var forbiddenComponents = FlattenComponents(settings.ForbiddenComponents);

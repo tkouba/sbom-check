@@ -16,11 +16,20 @@ record Component(
             yield break;
         }
 
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var choice in Licenses)
         {
-            yield return choice.License?.Id
-                ?? choice.License?.Name
-                ?? "UNKNOWN";
+            // Fallback chain: SPDX id → name → UNKNOWN
+            // Empty/whitespace values are treated as absent and skipped
+            var id = NonEmpty(choice.License?.Id)
+                  ?? NonEmpty(choice.License?.Name)
+                  ?? "UNKNOWN";
+
+            if (seen.Add(id))
+                yield return id;
         }
     }
+
+    static string? NonEmpty(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

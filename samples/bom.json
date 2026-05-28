@@ -72,6 +72,42 @@
       "name": "log4net",
       "version": "2.0.15",
       "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "type": "library",
+      "name": "MultiLicenseLib",
+      "version": "3.0.0",
+      "licenses": [
+        { "license": { "id": "MIT" } },
+        { "license": { "id": "Apache-2.0" } }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "DuplicateLicenseLib",
+      "version": "1.0.0",
+      "licenses": [
+        { "license": { "id": "MIT" } },
+        { "license": { "id": "MIT" } }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "EmptyIdLib",
+      "version": "1.0.0",
+      "licenses": [{ "license": { "id": "", "name": "Custom-1.0" } }]
+    },
+    {
+      "type": "library",
+      "name": "EmptyAllLib",
+      "version": "1.0.0",
+      "licenses": [{ "license": { "id": "", "name": "" } }]
+    },
+    {
+      "type": "library",
+      "name": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "licenses": [{ "license": { "id": "MIT" } }]
     }
   ]
 }
