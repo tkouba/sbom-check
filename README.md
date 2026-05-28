@@ -47,7 +47,7 @@ No policy configured → always exits `0`.
 | `--allowed-licenses <licenses>` | Whitelist mode — any unlisted license is a violation. Repeatable. |
 | `--forbidden-components <components>` | Component rules: name, `name@version`, or `name@range`. Repeatable. |
 | `--ignore-components <components>` | Exclude from all checks. Supports wildcards and version ranges. Repeatable. |
-| `--no-color` | Disable ANSI color and styling (plain text output). |
+| `--plain` | Plain ASCII output — no colors, no box-drawing characters. Recommended for CI log files. |
 
 All `<licenses>` and `<components>` values accept comma-separated lists and can be provided multiple times.
 
@@ -221,13 +221,30 @@ Supports wildcards and version ranges:
 
 ---
 
-### No-color output
+### Plain output
 
-Strip ANSI codes for plain-text log files or unsupported terminals:
+No colors and no box-drawing characters — safe for any log file or terminal:
 
 ```sh
-sbom-check bom.json --no-color --forbidden-licenses GPL-3.0
+sbom-check bom.json --plain --forbidden-licenses GPL-3.0
 ```
+
+```
+Invalid: License summary
+
+  GPL-3.0  2
+  MIT      7
+
+Total components found: 9
+
+Forbidden licenses detected:
+
+  GPL-3.0
+    - Some.Package@1.0.0
+    - Legacy.Component@2.1.3
+```
+
+Recommended for CI environments where ANSI output is not rendered.
 
 ---
 

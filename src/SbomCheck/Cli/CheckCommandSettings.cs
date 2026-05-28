@@ -25,7 +25,7 @@ class CheckCommandSettings : CommandSettings
     [Description("Components to exclude from all policy checks. Supports wildcards (e.g. Microsoft*) and version ranges. Takes priority over forbidden rules. Can be specified multiple times.")]
     public string[] IgnoreComponents { get; init; } = [];
 
-    [CommandOption("--no-color")]
-    [Description("Disable ANSI color and styling in output.")]
-    public bool NoColor { get; init; }
+    [CommandOption("--plain")]
+    [Description("Plain ASCII output — no colors, no box-drawing characters. Recommended for CI log files.")]
+    public bool Plain { get; init; }
 }

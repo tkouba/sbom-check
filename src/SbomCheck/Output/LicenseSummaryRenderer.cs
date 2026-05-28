@@ -5,7 +5,7 @@ namespace SbomCheck.Output;
 
 static class LicenseSummaryRenderer
 {
-    public static void Render(LicensesResult result)
+    public static void Render(LicensesResult result, bool plain)
     {
         string statusLabel = result.Status switch
         {
@@ -15,7 +15,7 @@ static class LicenseSummaryRenderer
             _                     => "Info"
         };
 
-        AnsiConsole.Write(new Rule($"{statusLabel}: License summary") { Justification = Justify.Left });
+        Header($"{statusLabel}: License summary", plain);
         AnsiConsole.WriteLine();
 
         if (result.LicenseDetails.Count > 0)
@@ -39,25 +39,35 @@ static class LicenseSummaryRenderer
         AnsiConsole.WriteLine($"Total components found: {result.TotalComponents}");
         AnsiConsole.WriteLine();
 
-        RenderIgnoredSection(result.IgnoredComponents);
+        RenderIgnoredSection(result.IgnoredComponents, plain);
 
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.Forbidden),
-            "Forbidden licenses detected");
+            "Forbidden licenses detected", plain);
 
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.NotAllowed),
-            "Licenses not in allowed list");
+            "Licenses not in allowed list", plain);
 
-        RenderComponentViolationSection(result.ComponentViolations);
+        RenderComponentViolationSection(result.ComponentViolations, plain);
     }
 
-    static void RenderIgnoredSection(List<IgnoredComponentInfo> ignored)
+    // In plain mode, MarkupLine strips all tags since AnsiConsole has Ansi=No configured.
+    // In rich mode, Rule renders the text with box-drawing separators.
+    static void Header(string markup, bool plain)
+    {
+        if (plain)
+            AnsiConsole.MarkupLine(markup);
+        else
+            AnsiConsole.Write(new Rule(markup) { Justification = Justify.Left });
+    }
+
+    static void RenderIgnoredSection(List<IgnoredComponentInfo> ignored, bool plain)
     {
         if (ignored.Count == 0)
             return;
 
-        AnsiConsole.Write(new Rule($"[dim]Ignored components ({ignored.Count})[/]") { Justification = Justify.Left });
+        Header($"[dim]Ignored components ({ignored.Count})[/]", plain);
         AnsiConsole.WriteLine();
 
         int maxRef = ignored.Max(c => (c.Name + "@" + c.Version).Length);
@@ -72,12 +82,12 @@ static class LicenseSummaryRenderer
         AnsiConsole.WriteLine();
     }
 
-    static void RenderComponentViolationSection(List<ComponentRuleViolation> violations)
+    static void RenderComponentViolationSection(List<ComponentRuleViolation> violations, bool plain)
     {
         if (violations.Count == 0)
             return;
 
-        AnsiConsole.Write(new Rule("[red]Forbidden components detected[/]") { Justification = Justify.Left });
+        Header("[red]Forbidden components detected[/]", plain);
         AnsiConsole.WriteLine();
 
         foreach (var rule in violations)
@@ -90,13 +100,13 @@ static class LicenseSummaryRenderer
         AnsiConsole.WriteLine();
     }
 
-    static void RenderViolationSection(IEnumerable<LicenseDetail> violations, string header)
+    static void RenderViolationSection(IEnumerable<LicenseDetail> violations, string header, bool plain)
     {
         var list = violations.OrderBy(ld => ld.LicenseId).ToList();
         if (list.Count == 0)
             return;
 
-        AnsiConsole.Write(new Rule($"[red]{Markup.Escape(header)}[/]") { Justification = Justify.Left });
+        Header($"[red]{Markup.Escape(header)}[/]", plain);
         AnsiConsole.WriteLine();
 
         foreach (var violation in list)

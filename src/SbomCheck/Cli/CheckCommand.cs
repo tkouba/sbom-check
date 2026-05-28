@@ -11,7 +11,7 @@ class CheckCommand : Command<CheckCommandSettings>
 {
     protected override int Execute(CommandContext context, CheckCommandSettings settings, CancellationToken cancellationToken)
     {
-        if (settings.NoColor)
+        if (settings.Plain)
         {
             AnsiConsole.Console = AnsiConsole.Create(new AnsiConsoleSettings
             {
@@ -67,7 +67,7 @@ class CheckCommand : Command<CheckCommandSettings>
                       : hasAnyViolation ? LicenseStatus.Invalid
                       :                   LicenseStatus.Valid;
 
-        LicenseSummaryRenderer.Render(result);
+        LicenseSummaryRenderer.Render(result, settings.Plain);
 
         return result.Status == LicenseStatus.Invalid ? 1 : 0;
     }
