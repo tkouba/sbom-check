@@ -1,5 +1,5 @@
-using SbomCheck.Models;
 using SbomCheck.Output;
+using SbomCheck.Policy;
 using SbomCheck.Sbom;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -17,19 +17,13 @@ class CheckCommand : Command<CheckCommandSettings>
             return 1;
         }
 
-        var licenseCounts = bom.Components
-            .SelectMany(c => c.GetLicenseIds())
-            .GroupBy(id => id, StringComparer.OrdinalIgnoreCase)
-            .Select(g => new LicenseDetail { LicenseId = g.Key, Count = g.Count() });
+        var forbiddenLicenses = settings.ForbiddenLicenses
+            .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
-        var result = new LicensesResult
-        {
-            Status = LicenseStatus.None, // Placeholder, real status calculation would go here
-            TotalComponents = bom.Components.Count,
-            LicenseDetails = licenseCounts.ToList()
-        };
+        var result = LicensePolicyEvaluator.Evaluate(bom, forbiddenLicenses);
 
         LicenseSummaryRenderer.Render(result);
-        return 0;
+
+        return result.Status == Models.LicenseStatus.Invalid ? 1 : 0;
     }
 }

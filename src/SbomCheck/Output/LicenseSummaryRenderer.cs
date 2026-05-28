@@ -8,12 +8,12 @@ static class LicenseSummaryRenderer
     public static void Render(LicensesResult result)
     {
         // Characters like ✔ and ✖ can cause issues in some terminals, so using text instead.
-        String statusText = result.Status switch
+        string statusText = result.Status switch
         {
-            LicenseStatus.Valid => "[green]Valid[/]: ",
+            LicenseStatus.Valid   => "[green]Valid[/]: ",
             LicenseStatus.Invalid => "[red]Invalid[/]: ",
-            LicenseStatus.Unknown => "[red]Invalid[/]: ", //"[dim]Unknown[/]: "
-            _ => ""
+            LicenseStatus.Unknown => "[red]Invalid[/]: ",
+            _                     => ""
         };
         AnsiConsole.MarkupLine($"{statusText}License summary");
         AnsiConsole.WriteLine();
@@ -24,7 +24,9 @@ static class LicenseSummaryRenderer
         foreach (var item in sorted)
         {
             var paddedLicense = item.LicenseId.PadRight(maxLen);
-            if (item.LicenseId == "UNKNOWN")
+            if (item.Status == LicenseStatus.Invalid)
+                AnsiConsole.MarkupLine($"  [red]{Markup.Escape(paddedLicense)}[/]  [red]{item.Count}[/]");
+            else if (item.LicenseId == "UNKNOWN")
                 AnsiConsole.MarkupLine($"  [dim]{Markup.Escape(paddedLicense)}[/]  [dim]{item.Count}[/]");
             else
                 AnsiConsole.MarkupLine($"  {Markup.Escape(paddedLicense)}  {item.Count}");
@@ -32,6 +34,26 @@ static class LicenseSummaryRenderer
 
         AnsiConsole.WriteLine();
         AnsiConsole.WriteLine($"Total components found: {result.TotalComponents}");
+        AnsiConsole.WriteLine();
+
+        var violations = result.LicenseDetails
+            .Where(ld => ld.Status == LicenseStatus.Invalid)
+            .OrderBy(ld => ld.LicenseId)
+            .ToList();
+
+        if (violations.Count == 0)
+            return;
+
+        AnsiConsole.MarkupLine("[red]Forbidden licenses detected:[/]");
+        AnsiConsole.WriteLine();
+
+        foreach (var violation in violations)
+        {
+            AnsiConsole.MarkupLine($"  [red]{Markup.Escape(violation.LicenseId)}[/]");
+            foreach (var component in violation.Components)
+                AnsiConsole.MarkupLine($"    - {Markup.Escape(component.Name)}@{Markup.Escape(component.Version)}");
+        }
+
         AnsiConsole.WriteLine();
     }
 }
