@@ -43,6 +43,26 @@ static class LicenseSummaryRenderer
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.NotAllowed),
             "Licenses not in allowed list:");
+
+        RenderComponentViolationSection(result.ComponentViolations);
+    }
+
+    static void RenderComponentViolationSection(List<ComponentRuleViolation> violations)
+    {
+        if (violations.Count == 0)
+            return;
+
+        AnsiConsole.MarkupLine("[red]Forbidden components detected:[/]");
+        AnsiConsole.WriteLine();
+
+        foreach (var rule in violations)
+        {
+            AnsiConsole.MarkupLine($"  [red]{Markup.Escape(rule.Display)}[/]");
+            foreach (var c in rule.Components)
+                AnsiConsole.MarkupLine($"    - {Markup.Escape(c.Name)}@{Markup.Escape(c.Version)}");
+        }
+
+        AnsiConsole.WriteLine();
     }
 
     static void RenderViolationSection(IEnumerable<LicenseDetail> violations, string header)

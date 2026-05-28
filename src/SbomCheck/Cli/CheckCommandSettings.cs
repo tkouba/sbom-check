@@ -16,4 +16,8 @@ class CheckCommandSettings : CommandSettings
     [CommandOption("--allowed-licenses <licenses>")]
     [Description("Comma-separated SPDX license IDs that are permitted (e.g. MIT,Apache-2.0). Any other license is a violation. Can be specified multiple times.")]
     public string[] AllowedLicenses { get; init; } = [];
+
+    [CommandOption("--forbidden-components <components>")]
+    [Description("Comma-separated package names to forbid (case-insensitive, e.g. log4net,Newtonsoft.Json). Can be specified multiple times.")]
+    public string[] ForbiddenComponents { get; init; } = [];
 }

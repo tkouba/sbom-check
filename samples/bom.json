@@ -54,6 +54,24 @@
       "type": "library",
       "name": "LegacyComponent",
       "version": "2.0.0"
+    },
+    {
+      "type": "library",
+      "name": "log4net",
+      "version": "1.2.10",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "type": "library",
+      "name": "log4net",
+      "version": "2.0.1",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "type": "library",
+      "name": "log4net",
+      "version": "2.0.15",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
     }
   ]
 }
