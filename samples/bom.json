@@ -1,0 +1,59 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "components": [
+    {
+      "type": "library",
+      "name": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "type": "library",
+      "name": "Microsoft.Extensions.Logging",
+      "version": "8.0.0",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "type": "library",
+      "name": "Microsoft.Extensions.DependencyInjection",
+      "version": "8.0.0",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "type": "library",
+      "name": "System.Text.Json",
+      "version": "8.0.4",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "type": "library",
+      "name": "Serilog",
+      "version": "3.1.1",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "type": "library",
+      "name": "AutoMapper",
+      "version": "12.0.1",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "type": "library",
+      "name": "FluentValidation",
+      "version": "11.9.0",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "type": "library",
+      "name": "SomeProprietaryLib",
+      "version": "1.0.0",
+      "licenses": [{ "license": { "name": "Proprietary License" } }]
+    },
+    {
+      "type": "library",
+      "name": "LegacyComponent",
+      "version": "2.0.0"
+    }
+  ]
+}

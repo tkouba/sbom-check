@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SbomCheck": {
+      "commandName": "Project",
+      "commandLineArgs": "bom.json"
+    }
+  }
+}
