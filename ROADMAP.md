@@ -129,8 +129,44 @@ log4net (<=2.0.1)
 - If version cannot be parsed → treat as violation (fail-safe)
 
 ---
+## ✅ v0.6 – Ignore components
 
-## ✅ v0.6 – Multi-license & Edge Cases
+- `--ignore-components `
+- Override rules
+- Wildcards
+- SemVer ranges
+- Combined and multiple
+
+Examples:
+
+```
+--ignore-components log4net
+--ignore-components log4net@2.0.1
+--ignore-components log4net@(-,2.0.1]
+```
+
+Ignore components with wildcard:
+
+```
+--ignore-components MyComponent*,Microsoft*
+```
+
+Ignore multiple versions:
+
+```
+--ignore-components log4net@(-,2.0.0],log4net@2.0.5
+```
+
+Combined example:
+
+```
+--ignore-components log4net@(-,2.0.0],log4net@2.0.5,Microsoft*
+```
+
+
+---
+
+## ✅ v0.7 – Multi-license & Edge Cases
 
 ### Features
 - full multi-license support
@@ -142,7 +178,7 @@ log4net (<=2.0.1)
 
 ---
 
-## ✅ v0.7 – CLI UX Improvements
+## ✅ v0.8 – CLI UX Improvements
 
 ### Features
 - better formatting:
@@ -153,7 +189,7 @@ log4net (<=2.0.1)
 
 ---
 
-# 🧪 v0.8 – Testing & Hardening
+# 🧪 v0.9 – Testing & Hardening
 
 ### Tests
 - valid SBOM
@@ -196,7 +232,6 @@ Order of post-1.0 enhancements is not planned, some of them may be cancelled or 
 Small enhancements with big impact
 
 - --fail-on-unknown-license
-- --ignore-components (override rules)
 - --summary-only (compact CI output)
   
 ## v1.x – Config File
