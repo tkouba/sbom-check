@@ -20,4 +20,8 @@ class CheckCommandSettings : CommandSettings
     [CommandOption("--forbidden-components <components>")]
     [Description("Comma-separated package names to forbid (case-insensitive, e.g. log4net,Newtonsoft.Json). Can be specified multiple times.")]
     public string[] ForbiddenComponents { get; init; } = [];
+
+    [CommandOption("--ignore-components <components>")]
+    [Description("Components to exclude from all policy checks. Supports wildcards (Microsoft*) and version ranges (log4net@(-,2.0.1]). Takes priority over forbidden rules. Can be specified multiple times.")]
+    public string[] IgnoreComponents { get; init; } = [];
 }

@@ -36,6 +36,8 @@ static class LicenseSummaryRenderer
         AnsiConsole.WriteLine($"Total components found: {result.TotalComponents}");
         AnsiConsole.WriteLine();
 
+        RenderIgnoredSection(result.IgnoredComponents);
+
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.Forbidden),
             "Forbidden licenses detected:");
@@ -45,6 +47,26 @@ static class LicenseSummaryRenderer
             "Licenses not in allowed list:");
 
         RenderComponentViolationSection(result.ComponentViolations);
+    }
+
+    static void RenderIgnoredSection(List<IgnoredComponentInfo> ignored)
+    {
+        if (ignored.Count == 0)
+            return;
+
+        AnsiConsole.MarkupLine($"[dim]Ignored components ({ignored.Count}):[/]");
+        AnsiConsole.WriteLine();
+
+        int maxRef = ignored.Max(c => (c.Name + "@" + c.Version).Length);
+
+        foreach (var c in ignored)
+        {
+            var componentRef = $"{c.Name}@{c.Version}".PadRight(maxRef);
+            var licenses     = string.Join(", ", c.Licenses);
+            AnsiConsole.MarkupLine($"  [dim]{Markup.Escape(componentRef)}  {Markup.Escape(licenses)}[/]");
+        }
+
+        AnsiConsole.WriteLine();
     }
 
     static void RenderComponentViolationSection(List<ComponentRuleViolation> violations)
