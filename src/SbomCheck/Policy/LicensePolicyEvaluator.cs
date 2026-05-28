@@ -5,10 +5,14 @@ namespace SbomCheck.Policy;
 
 static class LicensePolicyEvaluator
 {
-    public static LicensesResult Evaluate(BomDocument bom, IEnumerable<string> forbiddenLicenses)
+    public static LicensesResult Evaluate(
+        BomDocument bom,
+        IEnumerable<string> forbiddenLicenses,
+        IEnumerable<string> allowedLicenses)
     {
         var forbidden = new HashSet<string>(forbiddenLicenses, StringComparer.OrdinalIgnoreCase);
-        bool hasPolicy = forbidden.Count > 0;
+        var allowed   = new HashSet<string>(allowedLicenses,   StringComparer.OrdinalIgnoreCase);
+        bool hasPolicy = forbidden.Count > 0 || allowed.Count > 0;
 
         // licenseId → components using it
         var licenseMap = new Dictionary<string, List<LicenseComponent>>(StringComparer.OrdinalIgnoreCase);
@@ -27,15 +31,16 @@ static class LicensePolicyEvaluator
         var details = licenseMap
             .Select(kv =>
             {
-                var isForbidden = hasPolicy && forbidden.Contains(kv.Key);
+                var reason = ResolveViolationReason(kv.Key, forbidden, allowed);
                 return new LicenseDetail
                 {
-                    LicenseId = kv.Key,
-                    Count = kv.Value.Count,
-                    Status = hasPolicy
-                        ? (isForbidden ? LicenseStatus.Invalid : LicenseStatus.Valid)
-                        : LicenseStatus.None,
-                    Components = isForbidden ? kv.Value.ToArray() : []
+                    LicenseId       = kv.Key,
+                    Count           = kv.Value.Count,
+                    Status          = hasPolicy
+                                        ? (reason != ViolationReason.None ? LicenseStatus.Invalid : LicenseStatus.Valid)
+                                        : LicenseStatus.None,
+                    ViolationReason = reason,
+                    Components      = reason != ViolationReason.None ? kv.Value.ToArray() : []
                 };
             })
             .ToList();
@@ -46,9 +51,23 @@ static class LicensePolicyEvaluator
 
         return new LicensesResult
         {
-            Status = overallStatus,
+            Status          = overallStatus,
             TotalComponents = bom.Components.Count,
-            LicenseDetails = details
+            LicenseDetails  = details
         };
+    }
+
+    static ViolationReason ResolveViolationReason(
+        string licenseId,
+        HashSet<string> forbidden,
+        HashSet<string> allowed)
+    {
+        if (forbidden.Count > 0 && forbidden.Contains(licenseId))
+            return ViolationReason.Forbidden;
+
+        if (allowed.Count > 0 && !allowed.Contains(licenseId))
+            return ViolationReason.NotAllowed;
+
+        return ViolationReason.None;
     }
 }

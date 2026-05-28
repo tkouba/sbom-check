@@ -36,18 +36,25 @@ static class LicenseSummaryRenderer
         AnsiConsole.WriteLine($"Total components found: {result.TotalComponents}");
         AnsiConsole.WriteLine();
 
-        var violations = result.LicenseDetails
-            .Where(ld => ld.Status == LicenseStatus.Invalid)
-            .OrderBy(ld => ld.LicenseId)
-            .ToList();
+        RenderViolationSection(
+            result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.Forbidden),
+            "Forbidden licenses detected:");
 
-        if (violations.Count == 0)
+        RenderViolationSection(
+            result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.NotAllowed),
+            "Licenses not in allowed list:");
+    }
+
+    static void RenderViolationSection(IEnumerable<LicenseDetail> violations, string header)
+    {
+        var list = violations.OrderBy(ld => ld.LicenseId).ToList();
+        if (list.Count == 0)
             return;
 
-        AnsiConsole.MarkupLine("[red]Forbidden licenses detected:[/]");
+        AnsiConsole.MarkupLine($"[red]{header}[/]");
         AnsiConsole.WriteLine();
 
-        foreach (var violation in violations)
+        foreach (var violation in list)
         {
             AnsiConsole.MarkupLine($"  [red]{Markup.Escape(violation.LicenseId)}[/]");
             foreach (var component in violation.Components)

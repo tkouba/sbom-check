@@ -20,7 +20,10 @@ class CheckCommand : Command<CheckCommandSettings>
         var forbiddenLicenses = settings.ForbiddenLicenses
             .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
-        var result = LicensePolicyEvaluator.Evaluate(bom, forbiddenLicenses);
+        var allowedLicenses = settings.AllowedLicenses
+            .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+        var result = LicensePolicyEvaluator.Evaluate(bom, forbiddenLicenses, allowedLicenses);
 
         LicenseSummaryRenderer.Render(result);
 
