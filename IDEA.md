@@ -111,7 +111,7 @@ Behavior:
 
 ## Optional Features (Future)
 
-### 🔸 Forbidden component version range
+### ✅ Forbidden component version range (implemented in v0.5)
 
 - SemVer range syntax (log4net@(-,2.0.1])
 - Support multiple component rules
@@ -126,7 +126,7 @@ Behavior:
 ```
 ---
 
-### 🔸 Allowed Licenses Mode
+### ✅ Allowed Licenses Mode (implemented in v0.3)
 
 ```
 --allowed-licenses MIT,Apache-2.0
@@ -147,7 +147,7 @@ Only these licenses are permitted.
 
 ---
 
-### 🔸 Ignore components
+### ✅ Ignore components (implemented in v0.6)
 
 ```
 --ignore-components MyCompany.*,Legacy.*

@@ -1,159 +1,289 @@
 # sbom-check
 
-Lightweight CLI tool to **analyze and enforce policies on CycloneDX SBOMs**.
+Lightweight .NET CLI tool to **analyze and enforce license and component policies on [CycloneDX](https://cyclonedx.org/) SBOMs**.
+
+Designed for CI pipelines — exits with code `1` on any violation.
 
 ---
 
-## 🚀 Why sbom-check?
+## Installation
 
-Modern .NET projects rely heavily on third-party dependencies. While tools like CycloneDX generate SBOMs, there is a missing piece:
-
-👉 **Simple, fast policy enforcement for CI pipelines**
-
-sbom-check focuses on:
-
-- ✅ License visibility
-- ✅ Blocking unsafe licenses (e.g., GPL)
-- ✅ Blocking specific packages (e.g., log4net)
-- ✅ Zero over-engineering
-
----
-
-## 📦 Features
-
-### ✅ License Overview
-
-Display all licenses used in the project:
-
-```
-sbom-check bom.json
-```
-
-Output:
-
-```
-License summary
-
-  MIT                  5
-  Apache-2.0           2
-  GPL                  1
-  Proprietary License  1
-  UNKNOWN              1
-
-Total components found: 9
-```
-
----
-
-### 🚫 Forbidden Licenses
-
-Fail when forbidden licenses are detected:
-
-```
-sbom-check bom.json --forbidden-licenses GPL-3.0,AGPL-3.0
-```
-
-Output:
-
-```
-❌ Forbidden licenses detected:
-
-GPL-3.0:
- - Some.Package@1.0.0
- - Legacy.Component@2.1.3
-```
-
-Exit code:
-
-- `0` = OK
-- `1` = violation
-
----
-
-### 🚫 Forbidden Components
-
-Block specific packages:
-
-```
-sbom-check bom.json --forbidden-components log4net
-```
-
----
-
-## 📥 Installation
-
-```
+```sh
 dotnet tool install -g sbom-check
 ```
 
----
-
-## ⚙️ Usage
-
-Basic:
-
-```
-sbom-check <bom.json>
-```
-
-With policies:
-
-```
-sbom-check <bom.json>   --forbidden-licenses GPL-3.0   --forbidden-components log4net
-```
+Requires [.NET 10](https://dotnet.microsoft.com/download).
 
 ---
 
-## 📁 Input
+## Quick start
 
-- CycloneDX JSON (`bom.json`)
-
-Example generation:
+```sh
+sbom-check bom.json
+```
 
 ```
-dotnet cyclonedx MySolution.sln -o bom.json
+── Info: License summary ───────────────────────────────────────────────────────
+
+  MIT                  7
+  Apache-2.0           6
+  UNKNOWN              2
+  Proprietary License  1
+  Custom-1.0           1
+
+Total components found: 16
+```
+
+No policy configured → always exits `0`.
+
+---
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `bom.json` | Path to CycloneDX JSON file **(required)** |
+| `--forbidden-licenses <licenses>` | Comma-separated SPDX IDs to forbid. Repeatable. |
+| `--allowed-licenses <licenses>` | Whitelist mode — any unlisted license is a violation. Repeatable. |
+| `--forbidden-components <components>` | Component rules: name, `name@version`, or `name@range`. Repeatable. |
+| `--ignore-components <components>` | Exclude from all checks. Supports wildcards and version ranges. Repeatable. |
+| `--no-color` | Disable ANSI color and styling (plain text output). |
+
+All `<licenses>` and `<components>` values accept comma-separated lists and can be provided multiple times.
+
+---
+
+## Features
+
+### License overview
+
+Displays a license summary grouped by SPDX ID. No policy required.
+
+```sh
+sbom-check bom.json
+```
+
+- Licenses without a SPDX ID fall back to the license `name` field
+- Components with no license data are listed as `UNKNOWN`
+- Duplicate components (same name + version) are deduplicated automatically
+
+---
+
+### Forbidden licenses
+
+Fail when a component uses a forbidden license:
+
+```sh
+sbom-check bom.json --forbidden-licenses GPL-3.0,AGPL-3.0
+```
+
+```
+── Invalid: License summary ────────────────────────────────────────────────────
+
+  MIT                  7
+  Apache-2.0           6
+  UNKNOWN              2
+  Proprietary License  1
+  Custom-1.0           1
+
+Total components found: 16
+
+── Forbidden licenses detected ─────────────────────────────────────────────────
+
+  GPL-3.0
+    - Some.Package@1.0.0
+    - Legacy.Component@2.1.3
+```
+
+Exit code: `1`.
+
+---
+
+### Allowed licenses (whitelist)
+
+Only permit specific licenses — anything not on the list is a violation:
+
+```sh
+sbom-check bom.json --allowed-licenses MIT,Apache-2.0
+```
+
+```
+── Invalid: License summary ────────────────────────────────────────────────────
+
+  MIT                  7
+  Apache-2.0           6
+  UNKNOWN              2
+  Proprietary License  1
+  Custom-1.0           1
+
+Total components found: 16
+
+── Licenses not in allowed list ────────────────────────────────────────────────
+
+  Custom-1.0
+    - EmptyIdLib@1.0.0
+  Proprietary License
+    - SomeProprietaryLib@1.0.0
+  UNKNOWN
+    - LegacyComponent@2.0.0
+    - EmptyAllLib@1.0.0
+```
+
+`--forbidden-licenses` and `--allowed-licenses` can be combined. Forbidden always takes priority.
+
+---
+
+### Forbidden components
+
+Block specific packages by name (case-insensitive):
+
+```sh
+sbom-check bom.json --forbidden-components log4net
+```
+
+```
+── Invalid: License summary ────────────────────────────────────────────────────
+  ...
+
+── Forbidden components detected ───────────────────────────────────────────────
+
+  log4net
+    - log4net@1.2.10
+    - log4net@2.0.1
+    - log4net@2.0.15
+```
+
+**Version rules** — target an exact version or a [NuGet version range](https://learn.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges):
+
+```sh
+# Block all versions
+--forbidden-components log4net
+
+# Block an exact version only
+--forbidden-components log4net@2.0.1
+
+# Block a range: all versions up to and including 2.0.1
+--forbidden-components "log4net@(-,2.0.1]"
+
+# Multiple rules (comma-separated or repeated flag)
+--forbidden-components "log4net@(-,2.0.1]" --forbidden-components "log4net@2.0.15"
+```
+
+> **Fail-safe:** if a component's version is missing or cannot be parsed, the rule matches.
+
+---
+
+### Ignore components (escape hatch)
+
+Exclude specific components from all policy checks. Takes priority over every forbidden rule:
+
+```sh
+sbom-check bom.json \
+  --allowed-licenses MIT,Apache-2.0 \
+  --ignore-components "SomeProprietaryLib,LegacyComponent,EmptyIdLib,EmptyAllLib"
+```
+
+```
+── Valid: License summary ──────────────────────────────────────────────────────
+
+  MIT         7
+  Apache-2.0  6
+
+Total components found: 16
+
+── Ignored components (4) ──────────────────────────────────────────────────────
+
+  EmptyAllLib@1.0.0         UNKNOWN
+  EmptyIdLib@1.0.0          Custom-1.0
+  LegacyComponent@2.0.0     UNKNOWN
+  SomeProprietaryLib@1.0.0  Proprietary License
+```
+
+Exit code: `0`.
+
+Supports wildcards and version ranges:
+
+```sh
+# Wildcard — ignore all packages with this name prefix
+--ignore-components "Microsoft*"
+
+# Exact version
+--ignore-components "log4net@2.0.1"
+
+# Range — ignore versions up to and including 2.0.1
+--ignore-components "log4net@(-,2.0.1]"
+
+# Combined
+--ignore-components "Microsoft*,log4net@(-,2.0.1]"
+```
+
+> **Note:** for versioned ignore rules, a missing or unparseable component version is **not** ignored — it surfaces as a potential violation.
+
+---
+
+### No-color output
+
+Strip ANSI codes for plain-text log files or unsupported terminals:
+
+```sh
+sbom-check bom.json --no-color --forbidden-licenses GPL-3.0
 ```
 
 ---
 
-## ✅ Exit Codes
+## Exit codes
 
 | Code | Meaning |
-|------|--------|
-| 0 | Success |
-| 1 | Policy violation |
+|------|---------|
+| `0` | No violations (or no policy configured) |
+| `1` | Policy violation **or** input error (file not found, invalid JSON) |
 
 ---
 
-## 🧠 Design Principles
+## Generating a CycloneDX SBOM
 
-- minimal dependencies
-- no external API calls
-- SBOM is source of truth
-- deterministic output (CI-friendly)
+Install the CycloneDX .NET tool:
 
----
+```sh
+dotnet tool install -g CycloneDX
+```
 
-## 🚧 Roadmap
+Generate from a solution or project:
 
-See [ROADMAP.md]
+```sh
+dotnet cyclonedx MySolution.sln -o ./
+```
 
----
-
-## 🤝 Contributing
-
-- Keep it simple
-- Avoid unnecessary abstractions
-- Don’t introduce heavy frameworks
+This produces `bom.json` ready for `sbom-check`.
 
 ---
 
-## 📄 License
+## CI example (GitHub Actions)
+
+```yaml
+- name: Generate SBOM
+  run: dotnet cyclonedx MySolution.sln -o ./
+
+- name: Check SBOM policies
+  run: |
+    dotnet tool install -g sbom-check
+    sbom-check bom.json \
+      --forbidden-licenses GPL-3.0,AGPL-3.0,LGPL-3.0 \
+      --allowed-licenses MIT,Apache-2.0,BSD-2-Clause \
+      --ignore-components "MyCompany.*"
+```
+
+---
+
+## Design principles
+
+- **No network calls** — works fully offline
+- **Deterministic output** — same input always produces the same result
+- **Fail-safe** — ambiguous cases (missing versions, unknown licenses) surface as violations rather than being silently skipped
+- **Minimal dependencies** — [NuGet.Versioning](https://www.nuget.org/packages/NuGet.Versioning) and [Spectre.Console](https://spectreconsole.net/) only
+
+---
+
+## License
 
 MIT
-
----
-
-## TL;DR
-
-**sbom-check = simple SBOM → policy enforcement → CI fail**

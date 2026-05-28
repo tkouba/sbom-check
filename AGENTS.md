@@ -80,11 +80,10 @@ Output must always be:
 
 Supported rule types:
 
-- forbidden licenses
-- forbidden components
-
-Future:
-- allowed licenses (whitelist mode)
+- `--forbidden-licenses` — block components using specific SPDX license IDs
+- `--allowed-licenses` — whitelist mode; any unlisted license is a violation
+- `--forbidden-components` — block packages by name, exact version, or NuGet version range
+- `--ignore-components` — exclude components from all checks; supports wildcards and version ranges; takes priority over all forbidden rules
 
 ### Behavior
 
@@ -146,29 +145,37 @@ Only operate on data already present in SBOM.
 
 ```
 /src
-  Program.cs
-  Cli/
-  Sbom/
-  Policy/
-  Output/
+  SbomCheck/
+    Program.cs
+    Cli/           ← CheckCommand, CheckCommandSettings
+    Sbom/          ← BomReader, Models (BomDocument, Component, LicenseChoice)
+    Policy/        ← LicensePolicyEvaluator, ComponentPolicyEvaluator, ComponentRule, IgnoreRule
+    Output/        ← LicenseSummaryRenderer
+    Models/        ← LicensesResult, LicenseDetail, LicenseStatus, ViolationReason, …
 
 /tests
+  SbomCheck.Tests/ ← xUnit tests; accesses internals via InternalsVisibleTo
 
+/samples
+  bom.json        ← synthetic BOM covering edge cases
+  realWorld.json  ← real-world BOM used for integration tests
 ```
 
 ---
 
 ## Testing Strategy
 
-- Unit tests for:
-  - license parsing
-  - policy checks
+Test project: `tests/SbomCheck.Tests` (xUnit). Internals are exposed via `InternalsVisibleTo`.
 
-- Sample SBOM files:
-  - valid
-  - multi-license
-  - missing license
-  - violation scenarios
+Unit tests cover:
+- `BomReader` — file not found, invalid JSON, empty/null components field
+- `Component.GetLicenseIds` — SPDX ID, name fallback, UNKNOWN, deduplication
+- `LicensePolicyEvaluator` — no policy, forbidden, allowed list, priority rules
+- `ComponentPolicyEvaluator` — name-only, exact version, range, fail-safe
+- `ComponentRule` — parsing, math-notation normalization `(-,x]` → `(,x]`, fail-safe
+- `IgnoreRule` — wildcards, version ranges, inverted fail-safe
+
+Integration tests use `samples/realWorld.json` (166-component real-world BOM).
 
 ---
 
