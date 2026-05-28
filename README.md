@@ -12,7 +12,7 @@ Designed for CI pipelines — exits with code `1` on any violation.
 dotnet tool install -g sbom-check
 ```
 
-Requires [.NET 10](https://dotnet.microsoft.com/download).
+Requires [.NET 8 or later](https://dotnet.microsoft.com/download). (.NET 8 and .NET 9 support will be dropped after November 2026.)
 
 ---
 
