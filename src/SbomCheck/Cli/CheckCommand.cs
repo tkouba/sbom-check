@@ -11,10 +11,19 @@ class CheckCommand : Command<CheckCommandSettings>
 {
     protected override int Execute(CommandContext context, CheckCommandSettings settings, CancellationToken cancellationToken)
     {
+        if (settings.NoColor)
+        {
+            AnsiConsole.Console = AnsiConsole.Create(new AnsiConsoleSettings
+            {
+                Ansi        = AnsiSupport.No,
+                ColorSystem = ColorSystemSupport.NoColors,
+            });
+        }
+
         var bom = BomReader.TryRead(settings.BomFile, out var error);
         if (bom is null)
         {
-            AnsiConsole.MarkupLine($"[red]Error[/]: {Markup.Escape(error!)}");
+            AnsiConsole.MarkupLine($"[bold red]Error:[/] {Markup.Escape(error!)}");
             return 1;
         }
 

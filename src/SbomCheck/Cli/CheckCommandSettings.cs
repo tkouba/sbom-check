@@ -24,4 +24,8 @@ class CheckCommandSettings : CommandSettings
     [CommandOption("--ignore-components <components>")]
     [Description("Components to exclude from all policy checks. Supports wildcards (Microsoft*) and version ranges (log4net@(-,2.0.1]). Takes priority over forbidden rules. Can be specified multiple times.")]
     public string[] IgnoreComponents { get; init; } = [];
+
+    [CommandOption("--no-color")]
+    [Description("Disable ANSI color and styling in output.")]
+    public bool NoColor { get; init; }
 }

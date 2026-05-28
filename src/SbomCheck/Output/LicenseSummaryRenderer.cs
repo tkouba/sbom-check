@@ -7,29 +7,32 @@ static class LicenseSummaryRenderer
 {
     public static void Render(LicensesResult result)
     {
-        // Characters like ✔ and ✖ can cause issues in some terminals, so using text instead.
-        string statusText = result.Status switch
+        string statusLabel = result.Status switch
         {
-            LicenseStatus.Valid   => "[green]Valid[/]: ",
-            LicenseStatus.Invalid => "[red]Invalid[/]: ",
-            LicenseStatus.Unknown => "[red]Invalid[/]: ",
-            _                     => ""
+            LicenseStatus.Valid   => "[green]Valid[/]",
+            LicenseStatus.Invalid => "[red]Invalid[/]",
+            LicenseStatus.Unknown => "[red]Invalid[/]",
+            _                     => "Info"
         };
-        AnsiConsole.MarkupLine($"{statusText}License summary");
+
+        AnsiConsole.Write(new Rule($"{statusLabel}: License summary") { Justification = Justify.Left });
         AnsiConsole.WriteLine();
 
-        var sorted = result.LicenseDetails.OrderByDescending(ld => ld.Count);
-        int maxLen = result.LicenseDetails.Max(ld => ld.LicenseId.Length);
-
-        foreach (var item in sorted)
+        if (result.LicenseDetails.Count > 0)
         {
-            var paddedLicense = item.LicenseId.PadRight(maxLen);
-            if (item.Status == LicenseStatus.Invalid)
-                AnsiConsole.MarkupLine($"  [red]{Markup.Escape(paddedLicense)}[/]  [red]{item.Count}[/]");
-            else if (item.LicenseId == "UNKNOWN")
-                AnsiConsole.MarkupLine($"  [dim]{Markup.Escape(paddedLicense)}[/]  [dim]{item.Count}[/]");
-            else
-                AnsiConsole.MarkupLine($"  {Markup.Escape(paddedLicense)}  {item.Count}");
+            var sorted = result.LicenseDetails.OrderByDescending(ld => ld.Count);
+            int maxLen = result.LicenseDetails.Max(ld => ld.LicenseId.Length);
+
+            foreach (var item in sorted)
+            {
+                var paddedLicense = item.LicenseId.PadRight(maxLen);
+                if (item.Status == LicenseStatus.Invalid)
+                    AnsiConsole.MarkupLine($"  [red]{Markup.Escape(paddedLicense)}[/]  [red]{item.Count}[/]");
+                else if (item.LicenseId == "UNKNOWN")
+                    AnsiConsole.MarkupLine($"  [dim]{Markup.Escape(paddedLicense)}[/]  [dim]{item.Count}[/]");
+                else
+                    AnsiConsole.MarkupLine($"  {Markup.Escape(paddedLicense)}  {item.Count}");
+            }
         }
 
         AnsiConsole.WriteLine();
@@ -40,11 +43,11 @@ static class LicenseSummaryRenderer
 
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.Forbidden),
-            "Forbidden licenses detected:");
+            "Forbidden licenses detected");
 
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.NotAllowed),
-            "Licenses not in allowed list:");
+            "Licenses not in allowed list");
 
         RenderComponentViolationSection(result.ComponentViolations);
     }
@@ -54,7 +57,7 @@ static class LicenseSummaryRenderer
         if (ignored.Count == 0)
             return;
 
-        AnsiConsole.MarkupLine($"[dim]Ignored components ({ignored.Count}):[/]");
+        AnsiConsole.Write(new Rule($"[dim]Ignored components ({ignored.Count})[/]") { Justification = Justify.Left });
         AnsiConsole.WriteLine();
 
         int maxRef = ignored.Max(c => (c.Name + "@" + c.Version).Length);
@@ -74,7 +77,7 @@ static class LicenseSummaryRenderer
         if (violations.Count == 0)
             return;
 
-        AnsiConsole.MarkupLine("[red]Forbidden components detected:[/]");
+        AnsiConsole.Write(new Rule("[red]Forbidden components detected[/]") { Justification = Justify.Left });
         AnsiConsole.WriteLine();
 
         foreach (var rule in violations)
@@ -93,7 +96,7 @@ static class LicenseSummaryRenderer
         if (list.Count == 0)
             return;
 
-        AnsiConsole.MarkupLine($"[red]{header}[/]");
+        AnsiConsole.Write(new Rule($"[red]{Markup.Escape(header)}[/]") { Justification = Justify.Left });
         AnsiConsole.WriteLine();
 
         foreach (var violation in list)
