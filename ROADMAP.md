@@ -54,7 +54,15 @@ sbom-check bom.json --forbidden-licenses GPL-3.0
 
 ---
 
-## ✅ v0.3 – Component Blocking
+## ✅ v0.3 – Allowed Licenses (Whitelist)
+
+```
+--allowed-licenses MIT,Apache-2.0
+```
+
+---
+
+## ✅ v0.4 – Component Blocking
 
 ### Features
 - `--forbidden-components`
@@ -67,18 +75,6 @@ sbom-check bom.json --forbidden-licenses GPL-3.0
 ```
 sbom-check bom.json --forbidden-components log4net
 ```
-
----
-
-## ✅ v0.4 – Multi-license & Edge Cases
-
-### Features
-- full multi-license support
-- fallback chain:
-  - SPDX ID
-  - name
-  - UNKNOWN
-- deduplication (name + version)
 
 ---
 
@@ -134,7 +130,19 @@ log4net (<=2.0.1)
 
 ---
 
-## ✅ v0.6 – CLI UX Improvements
+## ✅ v0.6 – Multi-license & Edge Cases
+
+### Features
+- full multi-license support
+- fallback chain:
+  - SPDX ID
+  - name
+  - UNKNOWN
+- deduplication (name + version)
+
+---
+
+## ✅ v0.7 – CLI UX Improvements
 
 ### Features
 - better formatting:
@@ -145,7 +153,7 @@ log4net (<=2.0.1)
 
 ---
 
-# 🧪 v0.7 – Testing & Hardening
+# 🧪 v0.8 – Testing & Hardening
 
 ### Tests
 - valid SBOM
@@ -191,14 +199,6 @@ Small enhancements with big impact
 - --ignore-components (override rules)
 - --summary-only (compact CI output)
   
-## v1.x – Allowed Licenses (Whitelist)
-
-```
---allowed-licenses MIT,Apache-2.0
-```
-
----
-
 ## v1.x – Config File
 
 ```
