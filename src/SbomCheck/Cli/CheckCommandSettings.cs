@@ -28,4 +28,8 @@ class CheckCommandSettings : CommandSettings
     [CommandOption("--plain")]
     [Description("Plain ASCII output — no colors, no box-drawing characters. Recommended for CI log files.")]
     public bool Plain { get; init; }
+
+    [CommandOption("--message <text>")]
+    [Description("Custom message to replace the default \"License summary\" header title.")]
+    public string? Message { get; init; }
 }
