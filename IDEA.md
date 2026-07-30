@@ -30,6 +30,47 @@ Create a **.NET CLI tool** that:
 
 ---
 
+## Non-Goals
+
+- Full compliance engine (ORT-level)
+- License detection from source code
+- Complex policy DSL
+- `--warn-only` or similar feature, simple ignore exit code
+
+---
+
+## Design Principles
+
+- Simple CLI-first tool
+- No custom license resolution
+- Use SBOM as source of truth
+- Fast and dependency-free
+- CI-friendly
+  - tool works reliably in CI
+- Deterministic output
+- Simple onboarding for users
+- Minimal dependencies
+
+---
+
+## Target Users
+
+- .NET developers
+- DevOps engineers
+- Teams using CycloneDX SBOM
+
+---
+
+## Distribution
+
+- .NET global tool
+
+```
+dotnet tool install -g sbom-check
+```
+
+---
+
 ## Core Features
 
 ### ✅ 1. License Overview
@@ -69,7 +110,7 @@ Behavior:
 Output example:
 
 ```
-❌ Forbidden licenses detected:
+Forbidden licenses detected:
 
 GPL-3.0:
  - Some.Package@1.0.0
@@ -161,53 +202,6 @@ Only these licenses are permitted.
 
 ---
 
-### 🔸 Config File
-
-```
-sbom-check bom.json --config sbom-policy.json
-```
-
-Example:
-
-```
-{
-  "forbiddenLicenses": ["GPL-3.0"],
-  "forbiddenComponents": ["log4net"]
-}
-```
-
----
-
-### 🔸 Diff Mode
-
-```
-sbom-check bom.json --diff previous-bom.json
-```
-
-Detect new dependencies or licenses.
-
----
-
-### 🔸 Summary only
-
-```
-sbom-check bom.json --summary-only
-```
-
-Output:
-```
-✅ OK (MIT=12, Apache=8)
-```
-or for forbidden GPL
-```
-❌ FAIL (MIT=12, GPL=2)
-```
-
-- CI log noise
-  - CI-friendly
-
----
-
 ## Architecture
 
 ### Input
@@ -229,44 +223,12 @@ or for forbidden GPL
 
 ---
 
-## Design Principles
-
-- ✅ Simple CLI-first tool
-- ✅ No custom license resolution
-- ✅ Use SBOM as source of truth
-- ✅ Fast and dependency-free
-- ✅ CI-friendly
-
----
-
-## Non-Goals
-
-- ❌ Full compliance engine (ORT-level)
-- ❌ License detection from source code
-- ❌ Complex policy DSL
-- ❌ --warn-only or similar feature, simple ignore exit code
-
----
-
-## Target Users
-
-- .NET developers
-- DevOps engineers
-- Teams using CycloneDX SBOM
-
----
-
-## Distribution
-
-- .NET global tool
-
-```
-dotnet tool install -g sbom-check
-```
-
----
-
 ## Summary
 
 `sbom-check` fills the gap between SBOM generation and policy enforcement by providing a simple, fast, and developer-friendly CLI tool.
 
+### Final Notes
+
+Keep this tool small, focused, and predictable.
+
+If it starts looking like ORT → stop and reconsider.

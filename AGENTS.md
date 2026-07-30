@@ -11,7 +11,37 @@ It is intended for:
 
 👉 This is NOT a product spec (see IDEA.md for that).
 
----
+## Code Style
+
+### Type names vs aliases
+- **Declarations, casts, type annotations** → C# alias: `int`, `string`, `bool`, `double`
+- **Static methods, static properties, constants** → BCL class name: `Int32.TryParse`, `String.IsNullOrEmpty`, `String.Empty`, `Double.NaN`
+
+### Null and length checks
+- Prefer explicit checks: `value != null && value.Length > 0` over pattern matching `value is { Length: > 0 }`
+
+## Git Workflow for Issue Resolution
+
+When working on an issue, a dedicated Git branch must be created before any implementation work begins.
+
+### Requirements
+
+1. Create a separate branch for each issue. Prefix branch fix or feature depending on issue label `bug` or `enhancement`.
+2. Use a clear and descriptive branch name, preferably including the issue identifier.
+3. Commit all changes to the dedicated branch.
+4. Do not commit issue-related changes directly to the main, master, or release branches.
+5. After the work is completed and validated, open a Pull Request (PR) targeting the appropriate base branch.
+6. The issue is considered complete only after the Pull Request has been created and all required checks or reviews have been addressed.
+
+### Example
+
+```text
+Issue: #123 Login timeout handling
+Label: Bug
+
+Branch:
+fix/123-login-timeout
+```
 
 ## Core Philosophy
 
@@ -21,11 +51,9 @@ It is intended for:
 - CLI must be **CI-friendly** and deterministic
 - Prefer clarity over abstraction
 
----
-
 ## CLI Design Decisions
 
-### ❌ Do NOT use System.CommandLine
+### Do NOT use System.CommandLine
 
 Reasons:
 - unstable API across versions
@@ -33,9 +61,7 @@ Reasons:
 - weak documentation
 - high complexity for simple CLI scenarios
 
----
-
-### ✅ Preferred CLI option - Spectre.Console.Cli 
+### Preferred CLI option - Spectre.Console.Cli 
 
 Why:
 - richer CLI UX is desired
@@ -45,8 +71,6 @@ Benefits:
 - stable API
 - good developer experience
 - built-in formatting tools (tables, colors)
-
----
 
 ## Output Design
 
@@ -74,8 +98,6 @@ Output must always be:
     - Some.Package@1.0.0
 ```
 
----
-
 ## Policy Rules
 
 Supported rule types:
@@ -90,8 +112,6 @@ Supported rule types:
 - ANY violation → exit code 1
 - NO violations → exit code 0
 
----
-
 ## License Handling
 
 - Use SPDX IDs whenever available
@@ -103,8 +123,6 @@ Fallback order:
 2. License name
 3. UNKNOWN
 
----
-
 ## JSON Handling (CycloneDX)
 
 - Input assumed: CycloneDX JSON
@@ -114,15 +132,11 @@ Fallback order:
 
 Only operate on data already present in SBOM.
 
----
-
 ## Performance Considerations
 
 - Must be fast (used in CI)
 - Avoid network calls
 - Avoid heavy dependencies
-
----
 
 ## Non-Goals
 
@@ -131,15 +145,11 @@ Only operate on data already present in SBOM.
 - Custom SBOM generation
 - Complex policy DSL
 
----
-
 ## Error Handling
 
 - Clear, actionable error messages
 - Do not throw raw exceptions to user
 - Always print context (component + version)
-
----
 
 ## Suggested Project Structure
 
@@ -161,8 +171,6 @@ Only operate on data already present in SBOM.
   realWorld.json  ← real-world BOM used for integration tests
 ```
 
----
-
 ## Testing Strategy
 
 Test project: `tests/SbomCheck.Tests` (xUnit). Internals are exposed via `InternalsVisibleTo`.
@@ -177,25 +185,7 @@ Unit tests cover:
 
 Integration tests use `samples/realWorld.json` (166-component real-world BOM).
 
----
-
 ## Distribution
 
 - .NET global tool (`dotnet tool`)
 - No runtime dependencies preferred
-
----
-
-## Future Ideas
-
-- config file support
-- SBOM diff support
-- HTML report export
-
----
-
-## Final Notes
-
-Keep this tool small, focused, and predictable.
-
-If it starts looking like ORT → stop and reconsider.
