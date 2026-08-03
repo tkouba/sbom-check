@@ -1,9 +1,9 @@
-This project is maintained by humans.
+This project is maintained by one person.
 
-We expect participants to behave reasonably and respectfully.
+I expect participants to behave reasonably and respectfully.
 
-When disagreements arise, maintainers will make the final decision regarding acceptable behavior.
+When disagreements arise, I will make the final decision regarding acceptable behavior.
 
-Not everyone will agree with every decision, but we will do our best to act fairly and in the best interest of the project.
+Not everyone will agree with every decision, but I will do my best to act fairly and in the best interest of the project.
 
-If you have concerns, contact the maintainers.
+If you have concerns, contact me.
