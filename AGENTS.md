@@ -189,3 +189,9 @@ Integration tests use `samples/realWorld.json` (166-component real-world BOM).
 
 - .NET global tool (`dotnet tool`)
 - No runtime dependencies preferred
+
+## Release Process
+
+- Pushing a tag matching `vX.Y.Z` (e.g. `v1.2.0`) triggers `.github/workflows/release.yml`, which tests, packs (version taken from the tag, overriding the csproj default), publishes to NuGet.org, and creates a matching GitHub Release.
+- Publishing uses NuGet.org **Trusted Publishing** (OIDC) — no long-lived API key is stored in the repo. One-time setup required on nuget.org: a Trusted Publishing policy with Repository Owner `tkouba`, Repository `sbom-check`, Workflow File `release.yml`.
+- The workflow needs a `NUGET_USER` repository secret containing the nuget.org username (profile name, not email) associated with that policy.
