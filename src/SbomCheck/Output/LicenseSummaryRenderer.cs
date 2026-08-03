@@ -5,7 +5,7 @@ namespace SbomCheck.Output;
 
 static class LicenseSummaryRenderer
 {
-    public static void Render(LicensesResult result, bool plain, string? message = null)
+    public static void Render(LicensesResult result, bool plain, string? message = null, bool shortSummary = false)
     {
         string statusLabel = result.Status switch
         {
@@ -15,32 +15,39 @@ static class LicenseSummaryRenderer
             _                     => "Info"
         };
 
-        var title = message != null && message.Length > 0 ? message : "License summary";
+        var title = message != null && message.Length > 0
+            ? message
+            : shortSummary
+                ? $"Total components found: {result.TotalComponents}"
+                : "License summary";
         Header($"{statusLabel}: {Markup.Escape(title)}", plain);
         AnsiConsole.WriteLine();
 
-        if (result.LicenseDetails.Count > 0)
+        if (!shortSummary)
         {
-            var sorted = result.LicenseDetails.OrderByDescending(ld => ld.Count);
-            int maxLen = result.LicenseDetails.Max(ld => ld.LicenseId.Length);
-
-            foreach (var item in sorted)
+            if (result.LicenseDetails.Count > 0)
             {
-                var paddedLicense = item.LicenseId.PadRight(maxLen);
-                if (item.Status == LicenseStatus.Invalid)
-                    AnsiConsole.MarkupLine($"  [red]{Markup.Escape(paddedLicense)}[/]  [red]{item.Count}[/]");
-                else if (item.LicenseId == "UNKNOWN")
-                    AnsiConsole.MarkupLine($"  [dim]{Markup.Escape(paddedLicense)}[/]  [dim]{item.Count}[/]");
-                else
-                    AnsiConsole.MarkupLine($"  {Markup.Escape(paddedLicense)}  {item.Count}");
+                var sorted = result.LicenseDetails.OrderByDescending(ld => ld.Count);
+                int maxLen = result.LicenseDetails.Max(ld => ld.LicenseId.Length);
+
+                foreach (var item in sorted)
+                {
+                    var paddedLicense = item.LicenseId.PadRight(maxLen);
+                    if (item.Status == LicenseStatus.Invalid)
+                        AnsiConsole.MarkupLine($"  [red]{Markup.Escape(paddedLicense)}[/]  [red]{item.Count}[/]");
+                    else if (item.LicenseId == "UNKNOWN")
+                        AnsiConsole.MarkupLine($"  [dim]{Markup.Escape(paddedLicense)}[/]  [dim]{item.Count}[/]");
+                    else
+                        AnsiConsole.MarkupLine($"  {Markup.Escape(paddedLicense)}  {item.Count}");
+                }
             }
+
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine($"Total components found: {result.TotalComponents}");
+            AnsiConsole.WriteLine();
+
+            RenderIgnoredSection(result.IgnoredComponents, plain);
         }
-
-        AnsiConsole.WriteLine();
-        AnsiConsole.WriteLine($"Total components found: {result.TotalComponents}");
-        AnsiConsole.WriteLine();
-
-        RenderIgnoredSection(result.IgnoredComponents, plain);
 
         RenderViolationSection(
             result.LicenseDetails.Where(ld => ld.ViolationReason == ViolationReason.Forbidden),

@@ -39,7 +39,79 @@ public class LicenseSummaryRendererTests
         Assert.Contains("Valid: [red]inject[/]", output);
     }
 
-    static string Capture(Action<LicensesResult> render)
+    [Fact]
+    public void Render_ShortSummary_NoViolations_ShowsTotalInHeaderOnly()
+    {
+        var result = new LicensesResult
+        {
+            Status = LicenseStatus.None,
+            TotalComponents = 16,
+            LicenseDetails =
+            [
+                new LicenseDetail { LicenseId = "MIT", Count = 16, Status = LicenseStatus.Valid }
+            ]
+        };
+
+        var output = Capture(r => LicenseSummaryRenderer.Render(r, plain: true, shortSummary: true), result);
+
+        Assert.Contains("Info: Total components found: 16", output);
+        Assert.DoesNotContain("MIT", output);
+        Assert.DoesNotContain("License summary", output);
+    }
+
+    [Fact]
+    public void Render_ShortSummary_SuppressesLicenseListAndTotalsLine()
+    {
+        var result = new LicensesResult
+        {
+            Status = LicenseStatus.Invalid,
+            TotalComponents = 2,
+            LicenseDetails =
+            [
+                new LicenseDetail
+                {
+                    LicenseId = "GPL-3.0",
+                    Count = 1,
+                    Status = LicenseStatus.Invalid,
+                    ViolationReason = ViolationReason.Forbidden,
+                    Components = [new LicenseComponent("Some.Package", "1.0.0")]
+                }
+            ]
+        };
+
+        var output = Capture(r => LicenseSummaryRenderer.Render(r, plain: true, shortSummary: true), result);
+
+        Assert.DoesNotContain("GPL-3.0  1", output);
+        Assert.Contains("Forbidden licenses detected", output);
+        Assert.Contains("Some.Package@1.0.0", output);
+    }
+
+    [Fact]
+    public void Render_ShortSummary_SuppressesIgnoredComponentsSection()
+    {
+        var result = new LicensesResult
+        {
+            Status = LicenseStatus.Valid,
+            TotalComponents = 3,
+            IgnoredComponents = [new IgnoredComponentInfo("Legacy.Component", "1.0.0", ["MIT"])]
+        };
+
+        var output = Capture(r => LicenseSummaryRenderer.Render(r, plain: true, shortSummary: true), result);
+
+        Assert.DoesNotContain("Ignored components", output);
+        Assert.DoesNotContain("Legacy.Component", output);
+    }
+
+    [Fact]
+    public void Render_ShortSummary_WithMessage_MessageTakesPriority()
+    {
+        var output = Capture(r => LicenseSummaryRenderer.Render(r, plain: true, message: "Custom check", shortSummary: true));
+
+        Assert.Contains("Valid: Custom check", output);
+        Assert.DoesNotContain("Total components found", output);
+    }
+
+    static string Capture(Action<LicensesResult> render, LicensesResult? result = null)
     {
         var writer = new StringWriter();
         var previous = AnsiConsole.Console;
@@ -52,7 +124,7 @@ public class LicenseSummaryRendererTests
 
         try
         {
-            render(new LicensesResult { Status = LicenseStatus.Valid });
+            render(result ?? new LicensesResult { Status = LicenseStatus.Valid });
             return writer.ToString();
         }
         finally
