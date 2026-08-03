@@ -111,6 +111,37 @@ public class LicenseSummaryRendererTests
         Assert.DoesNotContain("Total components found", output);
     }
 
+    [Fact]
+    public void Render_ShortSummary_WithMessage_Invalid_ShowsMessageAndViolationsOnly()
+    {
+        var result = new LicensesResult
+        {
+            Status = LicenseStatus.Invalid,
+            TotalComponents = 5,
+            LicenseDetails =
+            [
+                new LicenseDetail { LicenseId = "MIT", Count = 4, Status = LicenseStatus.Valid }
+            ],
+            ComponentViolations =
+            [
+                new ComponentRuleViolation
+                {
+                    Display = "InTheHand.Bluetooth",
+                    Components = [new ComponentViolation("InTheHand.Bluetooth", "5.1.2")]
+                }
+            ]
+        };
+
+        var output = Capture(r => LicenseSummaryRenderer.Render(r, plain: true, message: "Dependency policy check", shortSummary: true), result);
+
+        Assert.Contains("Invalid: Dependency policy check", output);
+        Assert.DoesNotContain("License summary", output);
+        Assert.DoesNotContain("Total components found", output);
+        Assert.DoesNotContain("MIT", output);
+        Assert.Contains("Forbidden components detected", output);
+        Assert.Contains("InTheHand.Bluetooth@5.1.2", output);
+    }
+
     static string Capture(Action<LicensesResult> render, LicensesResult? result = null)
     {
         var writer = new StringWriter();
