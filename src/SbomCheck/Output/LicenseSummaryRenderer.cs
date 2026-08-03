@@ -5,7 +5,7 @@ namespace SbomCheck.Output;
 
 static class LicenseSummaryRenderer
 {
-    public static void Render(LicensesResult result, bool plain)
+    public static void Render(LicensesResult result, bool plain, string? message = null)
     {
         string statusLabel = result.Status switch
         {
@@ -15,7 +15,8 @@ static class LicenseSummaryRenderer
             _                     => "Info"
         };
 
-        Header($"{statusLabel}: License summary", plain);
+        var title = message != null && message.Length > 0 ? message : "License summary";
+        Header($"{statusLabel}: {Markup.Escape(title)}", plain);
         AnsiConsole.WriteLine();
 
         if (result.LicenseDetails.Count > 0)

@@ -48,6 +48,7 @@ No policy configured → always exits `0`.
 | `--forbidden-components <components>` | Component rules: name, `name@version`, or `name@range`. Repeatable. |
 | `--ignore-components <components>` | Exclude from all checks. Supports wildcards and version ranges. Repeatable. |
 | `--plain` | Plain ASCII output — no colors, no box-drawing characters. Recommended for CI log files. |
+| `--message <text>` | Replace the default "License summary" header title with a custom message. |
 
 All `<licenses>` and `<components>` values accept comma-separated lists and can be provided multiple times.
 
@@ -245,6 +246,20 @@ Forbidden licenses detected:
 ```
 
 Recommended for CI environments where ANSI output is not rendered.
+
+---
+
+### Custom message
+
+Replace the default "License summary" title with context of your own — useful for reusing policy rules to track technical debt or other dependency-related tasks in CI logs:
+
+```sh
+sbom-check bom.json --message "Dependency policy check"
+```
+
+```
+Valid: Dependency policy check
+```
 
 ---
 
