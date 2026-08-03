@@ -67,7 +67,7 @@ class CheckCommand : Command<CheckCommandSettings>
                       : hasAnyViolation ? LicenseStatus.Invalid
                       :                   LicenseStatus.Valid;
 
-        LicenseSummaryRenderer.Render(result, settings.Plain, settings.Message);
+        LicenseSummaryRenderer.Render(result, settings.Plain, settings.Message, settings.ShortSummary);
 
         return result.Status == LicenseStatus.Invalid ? 1 : 0;
     }

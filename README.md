@@ -49,6 +49,7 @@ No policy configured → always exits `0`.
 | `--ignore-components <components>` | Exclude from all checks. Supports wildcards and version ranges. Repeatable. |
 | `--plain` | Plain ASCII output — no colors, no box-drawing characters. Recommended for CI log files. |
 | `--message <text>` | Replace the default "License summary" header title with a custom message. |
+| `--short-summary` | Suppress the license overview and totals; show only the validation result and matched violations. |
 
 All `<licenses>` and `<components>` values accept comma-separated lists and can be provided multiple times.
 
@@ -259,6 +260,30 @@ sbom-check bom.json --message "Dependency policy check"
 
 ```
 Valid: Dependency policy check
+```
+
+---
+
+### Short summary
+
+Suppress the license overview and totals — useful for keeping CI logs focused on the validation result and matched violations:
+
+```sh
+sbom-check bom.json --short-summary --forbidden-components InTheHand.Bluetooth
+```
+
+```
+Invalid: Total components found: 16
+
+Forbidden components detected:
+  InTheHand.Bluetooth
+    - InTheHand.Bluetooth@5.1.2
+```
+
+When there are no violations, the header title becomes the total component count instead of "License summary":
+
+```
+Info: Total components found: 16
 ```
 
 ---

@@ -32,4 +32,8 @@ class CheckCommandSettings : CommandSettings
     [CommandOption("--message <text>")]
     [Description("Custom message to replace the default \"License summary\" header title.")]
     public string? Message { get; init; }
+
+    [CommandOption("--short-summary")]
+    [Description("Suppress the license overview and totals; show only the validation result and matched violations.")]
+    public bool ShortSummary { get; init; }
 }
