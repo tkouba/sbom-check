@@ -1,5 +1,11 @@
 # sbom-check
 
+![License](https://img.shields.io/github/license/tkouba/sbom-check)
+[![Release](https://github.com/tkouba/sbom-check/actions/workflows/release.yml/badge.svg)](https://github.com/tkouba/sbom-check/actions/workflows/release.yml)
+![NuGet](https://img.shields.io/nuget/v/sbom-check)
+![NuGet Downloads](https://img.shields.io/nuget/dt/sbom-check)
+
+
 Lightweight .NET CLI tool to **analyze and enforce license and component policies on [CycloneDX](https://cyclonedx.org/) SBOMs**.
 
 Designed for CI pipelines — exits with code `1` on any violation.
